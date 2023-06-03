@@ -46,7 +46,7 @@ app.use(router);
 
 app.get("/123", (req: Request, res: Response) => {
   console.log(4568);
-  res.send("<h1>Hey there</h1>");
+  res.send("<h1>Hey there!</h1>");
 });
 
 app.listen(port, () => {
