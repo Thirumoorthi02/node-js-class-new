@@ -8,6 +8,7 @@ const express = require("express");
 
 const app: Application = express();
 const router: Router = express.Router();
+// Fetch Port Number from Env or Default to 3000.
 const port = process.env.PORT || 3000;
 
 
