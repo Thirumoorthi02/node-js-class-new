@@ -22,3 +22,8 @@ doWork().then((result) => {
 }).catch((e) => {
     console.log('e', e)
 })
+
+// async function always return promise
+// Eg: console.log((()=>{})()) -------> undefined
+// Eg: console.log((async()=>{})()) -------> Promise{undefined}
+// Eg: console.log((async()=> "hello")()) -------> Promise{"hello"}
