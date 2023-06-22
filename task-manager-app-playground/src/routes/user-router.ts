@@ -45,7 +45,7 @@ router.get("/users", auth, adminAuth, async (req, res) => {
 // router to get particular user
 router.get("/users/myprofile", auth, async (req, res) => {
   try {
-    res.status(200).send((req as any)["user"]);
+    res.status(200).send(req.body.user);
   } catch (error: any) {
     res.status(500).send(error);
   }
@@ -79,7 +79,7 @@ router.patch("/users", auth, async (req, res) => {
     // // with findOne, findById methods we will get the install of mongoose model and it will update in the mongodb by save() function
     // const user = await User.findOne({ _id: req.params.id });
 
-    const user = (req as any).user as UserInstance;
+    const user = req.body.user as UserInstance;
 
     if (!user) {
       return res.status(404).send("User not found");
@@ -88,11 +88,12 @@ router.patch("/users", auth, async (req, res) => {
     updates.forEach(
       // here I am setting user as { [key: string]: any } or user as any as it shows error while assinging using with index key
       (key) =>
-        // (user[key] = req.body[key]) // this is shows error in Typescript
-
-        // we can use like this or switch case for each keys
-        // ((user as { [key: string]: any })[key] = req.body[key])
         {
+          // (user[key] = req.body[key]) // this is shows error in Typescript
+  
+          // we can use like this or switch case for each keys
+          // ((user as { [key: string]: any })[key] = req.body[key])
+          
           switch (key) {
             case "name":
               user["name"] = req.body.name;
@@ -128,7 +129,7 @@ router.delete("/users/me", auth, async (req, res) => {
   try {
     // const user = await User.findByIdAndDelete(req.params.id);
 
-    let user = (req as any).user as UserInstance;
+    let user = req.body.user as UserInstance;
     await user.deleteOne();
     res.send(user);
   } catch (error: any) {
@@ -141,7 +142,7 @@ router.delete("/users/me", auth, async (req, res) => {
 
 router.post("/users/logout", auth, async (req, res) => {
   try {
-    let user = (req as any).user as UserInstance;
+    let user = req.body.user as UserInstance;
     user.tokens = user.tokens.filter((token) => {
       return token.token !== (req as any).token;
     });
@@ -155,7 +156,7 @@ router.post("/users/logout", auth, async (req, res) => {
 
 router.post("/users/logoutAll", auth, async (req, res) => {
   try {
-    let user = (req as any).user as UserInstance;
+    let user = req.body.user as UserInstance;
     user.tokens = [];
     await user.save();
     res.send();

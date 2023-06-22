@@ -40,57 +40,72 @@ interface IUserVirtual {
   tasks: ITask;
 }
 
-const userSchema = new Schema<IUser, IUserModel>({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    unique: true, // it create index and it will only accept unique values
-    required: true,
-    trim: true,
-    lowercase: true,
-    validate(value: string) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Email is invalid");
-      }
+const userSchema = new Schema<IUser, IUserModel>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 7,
-    trim: true,
-    validate(value: string) {
-      if (value.toLowerCase().includes("password")) {
-        throw new Error('Password cannot contain "password"');
-      }
-    },
-  },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value: number) {
-      if (value < 0) {
-        throw new Error("Age must be a postive number");
-      }
-    },
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
+    email: {
+      type: String,
+      unique: true, // it create index and it will only accept unique values
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value: string) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Email is invalid");
+        }
       },
     },
-  ],
-  admin: {
-    type: Boolean,
-    default: false,
+    password: {
+      type: String,
+      required: true,
+      minlength: 7,
+      trim: true,
+      validate(value: string) {
+        if (value.toLowerCase().includes("password")) {
+          throw new Error('Password cannot contain "password"');
+        }
+      },
+    },
+    age: {
+      type: Number,
+      default: 0,
+      validate(value: number) {
+        if (value < 0) {
+          throw new Error("Age must be a postive number");
+        }
+      },
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    admin: {
+      type: Boolean,
+      default: false,
+    },
   },
-});
+  {
+    timestamps: true,
+    methods: { // methods can be provided here or can be separately added
+      generateAuthToken: async function () {
+        const user = this;
+        const token = generateJWTAuthToken({ _id: user._id });
+        user.tokens = user.tokens.concat({ token });
+        await user.save();
+        return token;
+      },
+      // we can also add statics, queries, virtuals here
+    },
+  }
+);
 
 // to create virtual property
 userSchema.virtual("tasks", {
@@ -149,14 +164,14 @@ userSchema.methods.toJSON = function () {
   return { name, email, age, _id };
 };
 
-userSchema.method("generateAuthToken", async function () {
-  const user = this as UserInstance;
+// userSchema.method("generateAuthToken", async function () {
+//   const user = this as UserInstance;
 
-  const token = generateJWTAuthToken({ _id: user._id });
-  user.tokens = user.tokens.concat({ token });
-  await user.save();
-  return token;
-});
+//   const token = generateJWTAuthToken({ _id: user._id });
+//   user.tokens = user.tokens.concat({ token });
+//   await user.save();
+//   return token;
+// });
 
 // Hash the plain password
 userSchema.pre("save", function (next: (value?: any) => void) {

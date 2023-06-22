@@ -2,11 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { verifyAndSendDecodedToken } from "../encryption-tools/jwt";
 import User from "../models/user";
 
-export const auth = async (
-  req: Request & { [key: string]: any },
-  res: Response,
-  next: NextFunction
-) => {
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = (req.header("Authorization") || "").replace("Bearer ", ""); //  to remove word Bearer from token
     const { _id } = verifyAndSendDecodedToken(token);
@@ -14,8 +10,11 @@ export const auth = async (
     if (!user) {
       return res.status(401).send("Please Authenticate!");
     }
-    req.user = user;
-    req.token = token;
+    if (!req.body) {
+      req.body = {};
+    }
+    req.body.user = user;
+    req.body.token = token;
     next();
     // console.log(token); //
   } catch (error) {
@@ -23,8 +22,12 @@ export const auth = async (
   }
 };
 
-export const adminAuth = async(req: any, res: Response, next: NextFunction) => {
-  if (req.user?.admin) {
+export const adminAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.body?.user?.admin) {
     return next();
   }
 
