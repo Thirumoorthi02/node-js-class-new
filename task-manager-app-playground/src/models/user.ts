@@ -14,6 +14,7 @@ interface IUser extends Document {
   password: string;
   tokens: Array<{ token: string }>;
   admin?: boolean;
+  avatar: Buffer;
 }
 
 // interface for User methods
@@ -91,10 +92,14 @@ const userSchema = new Schema<IUser, IUserModel>(
       type: Boolean,
       default: false,
     },
+    avatar: {
+      type: Buffer,
+    },
   },
   {
     timestamps: true,
-    methods: { // methods can be provided here or can be separately added
+    methods: {
+      // methods can be provided here or can be separately added
       generateAuthToken: async function () {
         const user = this;
         const token = generateJWTAuthToken({ _id: user._id });

@@ -10,11 +10,10 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       return res.status(401).send("Please Authenticate!");
     }
-    if (!req.body) {
-      req.body = {};
-    }
-    req.body.user = user;
-    req.body.token = token;
+
+    req.user = user;
+    req.token = token;
+
     next();
     // console.log(token); //
   } catch (error) {

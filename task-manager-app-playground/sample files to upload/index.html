@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Page</title>
+    <style>
+      /* Styling for the login page */
+      body {
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      form {
+        margin: auto;
+        width: 40%;
+        position: relative;
+        margin-top: 50px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        color: #555;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        width: 250px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      button {
+        display: inline-block;
+        padding: 0.75rem 1.25rem;
+        border: 0;
+        border-radius: 4px;
+        background-color: hsl(218deg 92% 57%);
+        color: #fff;
+        user-select: none;
+        font-size: 1rem;
+        transform-style: preserve-3d;
+        background-color: #4caf50;
+      }
+
+      button:before,
+      button:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        border-radius: 4px;
+        background-color: hsl(218deg 92% 35%);
+        background-color: hsl(153.02deg 87.85% 22.35%);
+        transform: translateZ(-5px);
+      }
+
+      button:after {
+        background-color: hsl(218deg 92% 20%);
+        background-color: hsl(173.63deg 95.94% 15.61%);
+        transform: translateZ(-10px);
+      }
+
+      .button-wrapper {
+        position: relative;
+        perspective: 400px;
+        align-self: flex-start;
+      }
+
+      /* .button-wrapper {
+      position: relative;
+      perspective: 400px;
+      margin-top: 20px;
+    }
+
+    button[type="submit"] {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      transform-style: preserve-3d;
+      transition: all 0.2s ease;
+      width: auto;
+      display: inline-block;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+      transform: translateZ(0);
+      transform-origin: center center;
+    }
+
+    button[type="submit"]:before,
+    button[type="submit"]:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background-color: hsl(218deg, 92%, 35%);
+    }
+
+    button[type="submit"]:before {
+      transform: translateZ(-500px);
+    }
+
+    button[type="submit"]:after {
+      background-color: hsl(218deg, 92%, 20%);
+      transform: translateZ(-1000px);
+    } */
+
+      button[type="submit"]:hover {
+        /* Uncomment the next line to enable the moveRandomly animation */
+        /* animation: moveRandomly 2s infinite; */
+        box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Commenting out the moveRandomly animation */
+      /*@keyframes moveRandomly {
+      0% {
+        transform: translate(0, 0) rotateX(0) rotateY(0);
+      }
+      25% {
+        transform: translate(-10px, -10px) rotateX(1deg) rotateY(-1deg);
+      }
+      50% {
+        transform: translate(10px, -10px) rotateX(-1deg) rotateY(1deg);
+      }
+      75% {
+        transform: translate(-10px, 10px) rotateX(1deg) rotateY(-1deg);
+      }
+      100% {
+        transform: translate(0, 0) rotateX(0) rotateY(0);
+      }
+    }*/
+    </style>
+  </head>
+  <body>
+    <h1>Login Page</h1>
+    <form>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required /><br /><br />
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+      /><br /><br />
+      <div class="button-wrapper">
+        <button type="submit" id="submit-btn" value="">Submit</button>
+      </div>
+    </form>
+    <script>
+      const button = document.getElementById("submit-btn");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      let isAnimationEnabled = true;
+
+      // Calculates the distance between two points
+      const distanceBetween = (p1x, p1y, p2x, p2y) => {
+        const dx = p1x - p2x;
+        const dy = p1y - p2y;
+        return Math.sqrt(dx * dx + dy * dy);
+      };
+
+      let bx, by;
+
+      const updateButtonCentreValues = () => {
+        // another way to calc button centre, but it is calculated based on position relative
+        // bx = button.parentNode.offsetLeft + button.offsetLeft + button.offsetWidth / 2;
+        // by = button.parentNode.offsetTop + button.offsetTop + button.offsetHeight / 2;
+
+        let buttonRect = button.getBoundingClientRect();
+        bx = Math.round(buttonRect.x + buttonRect.width / 2);
+        by = Math.round(buttonRect.y + buttonRect.height / 2);
+      };
+      updateButtonCentreValues();
+      window.addEventListener("resize", updateButtonCentreValues);
+
+      // Event listener for mouse movement
+      document.addEventListener("mousemove", (event) => {
+        if (!isAnimationEnabled) return;
+
+        const radius = Math.max(
+          button.offsetWidth * 0.75,
+          button.offsetHeight * 0.75,
+          120
+        );
+
+        const dist = distanceBetween(event.clientX, event.clientY, bx, by);
+        const angle = Math.atan2(event.clientY - by, event.clientX - bx);
+
+        // const ox = -1 * Math.cos(angle) * Math.max(radius - dist, 0);
+        // const oy = -1 * Math.sin(angle) * Math.max(radius - dist, 0);
+        // we are multiplying by -1 above because cos(180+angle) = -cos(angle)
+        // and sin(180+angle)=-sin(angle)
+        const ox = Math.cos(angle + Math.PI) * Math.max(radius - dist, 0);
+        const oy = Math.sin(angle + Math.PI) * Math.max(radius - dist, 0);
+
+        // Another way if we take the actual graph axis, because in browser y-axis starts from top
+        // So here setting Y axis value as negative
+        // let angle = Math.atan2((-1*event.clientY) - (-1*by), event.clientX - bx);
+        // // if(angle<0){
+        // //   angle = ((angle*180/Math.PI) + 180 + 180)*Math.PI/180;
+        // // }
+
+        // here we are adding Math.PI to angle because we want the button to opposite side of the mouse pointer
+        // const ox = Math.cos(angle+Math.PI) * Math.max(radius - dist, 0);
+        // here we are multiplying by -1 because we will be having negative y-axis
+        // value considering actual axis instead of browser axis
+        // const oy = -1 * Math.sin(angle+Math.PI) * Math.max(radius - dist, 0);
+
+        const rx = oy / 2;
+        const ry = -ox / 2;
+
+        // console.log(button.offsetWidth, "button.offsetWidth");
+        // console.log(button.offsetHeight, "button.offsetHeight");
+        // console.log(button.offsetLeft, "button.offsetLeft");
+        // console.log(button.offsetTop, "button.offsetTop");
+        // console.log(radius, "radius");
+        // console.log(
+        //   button.parentNode.offsetLeft,
+        //   "button.parentNode.offsetLeft"
+        // );
+        // console.log(button.parentNode.offsetTop, "button.parentNode.offsetTop");
+        // console.log(bx, "bx");
+        // console.log(by, "by");
+        // console.log(event.clientX, "event.clientX");
+        // console.log(event.clientY, "event.clientY");
+        // console.log(
+        //   event.clientY - by,
+        //   event.clientX - bx,
+        //   "event.clientY - by, event.clientX - bx"
+        // );
+        // console.log(dist, "dist");
+        // console.log(angle, "angle");
+        // console.log((angle * 180) / Math.PI, "angle in deg");
+        // console.log(Math.cos(angle), "Math.cos(angle)");
+        // console.log(Math.sin(angle), "Math.sin(angle)");
+        // console.log(ox, "ox");
+        // console.log(oy, "oy");
+        // console.log(rx, "rx");
+        // console.log(ry, "ry");
+        // console.log("----------------------------------------------\n");
+
+        // Apply animation styles to the button
+        button.style.transition = "all 0.1s ease";
+        button.style.transform = `translate(${ox}px, ${oy}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        button.style.boxShadow = `0px ${Math.abs(oy)}px ${
+          (Math.abs(oy) / radius) * 40
+        }px rgba(0, 0, 0, 0.15)`;
+      });
+
+      // Resets the button state
+      const resetButtonState = () => {
+        button.style.transition = "all 0.1s ease";
+        button.style.transform = "translate(0, 0) rotateX(0) rotateY(0)";
+        button.style.boxShadow = "0px 0px 20px rgba(0, 0, 0, 0.15)";
+      };
+
+      // Function to handle "No Cheating" behavior
+      const nocheat = () => {
+        if (
+          usernameInput.value.trim() === "" ||
+          passwordInput.value.trim() === ""
+        ) {
+          button.innerHTML = "No Cheating 🙅‍♂️😊";
+          isAnimationEnabled = true;
+          // document.dispatchEvent('mousemove')
+        } else {
+          button.innerHTML = "Submit";
+          resetButtonState();
+          isAnimationEnabled = false;
+        }
+      };
+
+      // Function to handle touch-related message
+      const notouch = () =>
+        (button.value = "This thing doesn't work with touch 😢");
+
+      // Event listener for button click
+      button.addEventListener("click", (event) => {
+        if (
+          usernameInput.value.trim() !== "" &&
+          passwordInput.value.trim() !== ""
+        ) {
+          button.innerHTML = "Submit";
+          resetButtonState();
+          isAnimationEnabled = false;
+        } else {
+          event.preventDefault();
+          nocheat();
+        }
+      });
+
+      // Event listener for Enter key press
+      button.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Enter" &&
+          (usernameInput.value.trim() === "" ||
+            passwordInput.value.trim() === "")
+        ) {
+          event.preventDefault();
+          nocheat();
+        }
+      });
+
+      button.click = nocheat;
+
+      // Check if the device is a touch device
+      if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) notouch();
+      window.addEventListener("touchstart", notouch);
+
+      // Check input values and handle animation accordingly
+      const checkInputValues = () => {
+        if (
+          usernameInput.value.trim() !== "" &&
+          passwordInput.value.trim() !== ""
+        ) {
+          isAnimationEnabled = false;
+          resetButtonState();
+          nocheat();
+        } else {
+          isAnimationEnabled = true;
+        }
+      };
+
+      usernameInput.addEventListener("input", checkInputValues);
+      passwordInput.addEventListener("input", checkInputValues);
+    </script>
+  </body>
+</html>
